@@ -1,0 +1,16 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v5
+      - name: Build PageTheScroll for the iOS Simulator
+        run: xcodebuild -project PageTheScroll/PageTheScroll.xcodeproj -target PageTheScroll -sdk iphonesimulator -configuration Debug CODE_SIGNING_ALLOWED=NO build

@@ -1,60 +1,38 @@
-//
-//  ViewController.swift
-//  PageTheScroll
-//
-//  Created by Milind Patel on 2017-11-21.
-//  Copyright © 2017 Milind Patel. All rights reserved.
-//
-
 import UIKit
 
+/// A paging scroll view with one centred icon per page.
 class ViewController: UIViewController {
-    
     @IBOutlet var scrollView: UIScrollView!
-    var images = [UIImageView]()
+
+    private let imageNames = ["icon0", "icon1", "icon2"]
+    private var images = [UIImageView]()
+    private let iconSize: CGFloat = 150
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        
-    }
-
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
-    }
-
-    
-    override func viewDidAppear(_ animated: Bool) {
-        var contentWidth: CGFloat = 0.0
-        
-        print("Scrollview width: \(scrollView.frame.size.width)")
-        
-        let scrollWidth = scrollView.frame.size.width
-        
-        for x in 0...2{
-            let image = UIImage(named: "icon\(x).png")
-            let imageView = UIImageView(image: image)
-            images.append(imageView)
-            
-            var newX : CGFloat = 0.0
-            
-            newX = scrollWidth / 2 + scrollWidth * CGFloat(x)
-            
-            contentWidth += newX
-            
-            scrollView.addSubview(imageView)
-            
-            imageView.frame = CGRect(x: newX - 75, y: (scrollView.frame.size.height/2) - 75, width: 150, height: 150)
-        }
-        
-        print("Count: \(images.count)")
-        
-     
         scrollView.clipsToBounds = false
-        
-        scrollView.contentSize = CGSize(width: contentWidth, height: view.frame.size.height)
+        for name in imageNames {
+            let imageView = UIImageView(image: UIImage(named: name))
+            imageView.contentMode = .scaleAspectFit
+            scrollView.addSubview(imageView)
+            images.append(imageView)
+        }
     }
 
+    // Lay the pages out whenever the size changes (first layout, rotation, split view).
+    // Previously this ran in viewDidAppear and added a new set of icons every time.
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        let page = scrollView.bounds.size
+        for (index, imageView) in images.enumerated() {
+            let centerX = page.width / 2 + page.width * CGFloat(index)
+            imageView.frame = CGRect(
+                x: centerX - iconSize / 2,
+                y: page.height / 2 - iconSize / 2,
+                width: iconSize,
+                height: iconSize
+            )
+        }
+        scrollView.contentSize = CGSize(width: page.width * CGFloat(images.count), height: page.height)
+    }
 }
-
